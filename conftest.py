@@ -1,3 +1,4 @@
+import os
 import pytest
 from playwright.sync_api import sync_playwright
 
@@ -10,8 +11,14 @@ def playwright_instance():
 
 @pytest.fixture(scope="function")
 def browser(playwright_instance):
-    # Mode headless activé par défaut (idéal pour Jenkins et exécution rapide)
-    browser = playwright_instance.chromium.launch(headless=True)
+    # Détection automatique de l'environnement :
+    # Si exécuté sous Jenkins (CI), mode headless (sans interface)
+    # Si exécuté en local, mode visible avec animation ralentie (démo prof)
+    is_ci = bool(os.getenv("JENKINS_HOME") or os.getenv("CI"))
+    browser = playwright_instance.chromium.launch(
+        headless=True if is_ci else False,
+        slow_mo=0 if is_ci else 300
+    )
     yield browser
     browser.close()
 
