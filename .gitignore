@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
+
+# Pytest / Test reports
+.pytest_cache/
+reports/*.html
+reports/*.xml
+test-results/
+playwright-report/
+
+# OS
+.DS_Store
+Thumbs.db
