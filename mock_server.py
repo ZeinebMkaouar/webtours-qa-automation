@@ -169,6 +169,8 @@ class MockWebToursHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(b"<html><body><h1>Welcome to the Web Tours site</h1></body></html>")
         elif path == "/cgi-bin/info_welcome.html":
             self.wfile.write(INFO_WELCOME.encode("utf-8"))
+        elif path == "/cgi-bin/info_error.html":
+            self.wfile.write(INFO_ERROR.encode("utf-8"))
         elif path == "/cgi-bin/search.html":
             self.wfile.write(INFO_SEARCH.encode("utf-8"))
         else:
