@@ -1,8 +1,19 @@
 import os
+import socket
 import pytest
 from playwright.sync_api import sync_playwright
 
 BASE_URL = "http://127.0.0.1:1080/WebTours/index.htm"
+
+@pytest.fixture(scope="session", autouse=True)
+def ensure_server():
+    """Démarre le serveur mock automatiquement sur GitHub Actions (dans le cloud GitHub)."""
+    if os.getenv("GITHUB_ACTIONS"):
+        from mock_server import start_server_in_thread
+        server = start_server_in_thread()
+        yield server
+    else:
+        yield None
 
 @pytest.fixture(scope="session")
 def playwright_instance():
@@ -11,10 +22,9 @@ def playwright_instance():
 
 @pytest.fixture(scope="function")
 def browser(playwright_instance):
-    # Détection automatique de l'environnement :
-    # Si exécuté sous Jenkins (CI), mode headless (sans interface)
-    # Si exécuté en local, mode visible avec animation ralentie (démo prof)
-    is_ci = bool(os.getenv("JENKINS_HOME") or os.getenv("CI"))
+    # En environnement CI (GitHub Actions ou Jenkins), mode headless
+    # En local, mode visible avec animation
+    is_ci = bool(os.getenv("JENKINS_HOME") or os.getenv("CI") or os.getenv("GITHUB_ACTIONS"))
     browser = playwright_instance.chromium.launch(
         headless=True if is_ci else False,
         slow_mo=0 if is_ci else 300

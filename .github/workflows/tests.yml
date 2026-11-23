@@ -1,0 +1,38 @@
+name: Run Automated Tests
+
+on:
+  workflow_dispatch: # Bouton manuel "Run workflow" sur GitHub !
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Playwright Tests (5 Scenarios)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Execute Automated Tests
+        run: |
+          pytest test_webtours.py -v --html=reports/report.html --self-contained-html --junitxml=reports/results.xml
+
+      - name: Upload Test Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-report
+          path: reports/report.html
